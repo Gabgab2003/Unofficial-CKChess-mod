@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "ckchess",
+  "version": "${version}",
+  "name": "Ckchess",
+  "license": "CC0-1.0",
+  "icon": "assets/ckchess/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.downloadpizza.ckchess.Ckchess"
+    ]
+  },
+  "mixins": [
+    "ckchess.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.8.2+build.194",
+    "fabric": "*",
+    "minecraft": "1.15.2"
+  }
+}
