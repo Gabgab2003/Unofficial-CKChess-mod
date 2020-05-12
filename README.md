@@ -16,3 +16,6 @@ Credits:
  - [LibGUI](https://github.com/CottonMC/LibGui)
  - [LibGUI Discord](https://discord.gg/9M5sACm)
  - [Fabric](https://github.com/FabricMC/fabric) 
+
+Instructions:
+You need the Fabric Loader, The Fabric API (sepperate) and the LibGUI mod
