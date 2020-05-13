@@ -19,3 +19,4 @@ Credits:
 
 Instructions:
 You need the Fabric Loader, The Fabric API (sepperate) and the LibGUI mod
+Press I to open the board GUI, its easiest to use the getpos button while standing in the lower left corner (on a figure) of the board. Also set the spaccing, so for example R##K is a spacing of 3 as you need to move 3 to the next figure. IF you are on the white side, leave the white checkmark clicked, it only changes the numbers on the side
