@@ -4,18 +4,12 @@ import io.github.cottonmc.cotton.gui.client.BackgroundPainter;
 import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.WGridPanel;
-import io.github.cottonmc.cotton.gui.widget.WLabel;
 import io.github.cottonmc.cotton.gui.widget.WSprite;
 import net.downloadpizza.ckchess.board.ChessBoard;
 import net.downloadpizza.ckchess.board.ChessPiece;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.entity.boss.BossBar;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class ShowBoardGui extends LightweightGuiDescription {
@@ -40,9 +34,28 @@ public class ShowBoardGui extends LightweightGuiDescription {
             new Identifier("font","h.png")
     };
 
-    public static final int pieceSize = 25;
+    private static final Identifier EMPTY_FIELD = new Identifier("pieces", "empty.png");
 
-    public ShowBoardGui(ChessBoard board, boolean whiteSide) {
+    public static final int pieceSize = 25;
+    private final ChessBoard board = new ChessBoard();
+    private final ChessBoardRenderer boardRenderer = new ChessBoardRenderer(board);
+    private final ChangeBoardGui cbg;
+
+    private final WSprite[] leftLabels = newSpriteArray();
+    private final WSprite[] rightLabels = newSpriteArray();
+    private final WSprite[] topLabels = newSpriteArray();
+    private final WSprite[] bottomLabels = newSpriteArray();
+
+    private static WSprite[] newSpriteArray() {
+        WSprite[] sprites = new WSprite[8];
+        for (int i = 0; i < 8; i++) {
+            sprites[i] = new WSprite(EMPTY_FIELD);
+        }
+        return sprites;
+    }
+
+    public ShowBoardGui(ChangeBoardGui cbg) {
+        this.cbg = cbg;
 
         WGridPanel root = new WGridPanel(pieceSize);
         setRootPanel(root);
@@ -50,22 +63,28 @@ public class ShowBoardGui extends LightweightGuiDescription {
         root.setSize(pieceSize*10, pieceSize*10);
 
         for (int i = 0; i < 8; i++) {
-            int index;
-            if(!whiteSide) {
-                index = i;
-            } else {
-                index = 7-i;
-            }
+            root.add(leftLabels[i], 0, i+1 , 1, 1);
+            root.add(rightLabels[i], 9, i+1, 1, 1);
 
-
-            root.add(new WSprite(ROWS[index]), 0, i+1 , 1, 1);
-            root.add(new WSprite(ROWS[index]), 9, i+1, 1, 1);
-
-            root.add(new WSprite(COLUMNS[i]), i+1, 0, 1, 1);
-            root.add(new WSprite(COLUMNS[i]), i+1, 9, 1, 1);
+            root.add(topLabels[i], i+1, 0, 1, 1);
+            root.add(bottomLabels[i], i+1, 9, 1, 1);
         }
 
-        root.add(new ChessBoardRenderer(board), 1, 1, 8, 8);
+        root.add(boardRenderer, 1, 1, 8, 8);
+    }
+
+    public void redraw() {
+        for (int i = 0; i < 8; i++) {
+            int rowIndex = cbg.isWhiteSide() ? 7 - i : i;
+            int columnIndex = cbg.isWhiteSide() ? i : 7 - i;
+            leftLabels[i].setImage(ROWS[rowIndex]);
+            rightLabels[i].setImage(ROWS[rowIndex]);
+
+            topLabels[i].setImage(COLUMNS[columnIndex]);
+            bottomLabels[i].setImage(COLUMNS[columnIndex]);
+        }
+        board.load(cbg.getBlock(), cbg.getDirection(), cbg.getSpacing());
+        boardRenderer.redraw();
     }
 }
 
@@ -86,10 +105,28 @@ class ChessBoardRenderer extends WGridPanel {
         }
     };
 
+    private final WSprite[][] sprites = new WSprite[8][8];
+    private final ChessBoard board;
+
     ChessBoardRenderer(ChessBoard board) {
         super(ShowBoardGui.pieceSize);
+        this.board = board;
         this.setSize(8*ShowBoardGui.pieceSize, 8*ShowBoardGui.pieceSize);
         this.setBackgroundPainter(CHECKER_BOARD);
+
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                WSprite field = new WSprite(EMPTY_FIELD);
+                sprites[x][y] = field;
+                this.add(field, x, y);
+            }
+        }
+    }
+
+    public void redraw() {
+        if(board == null) {
+            return;
+        }
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
                 ChessPiece piece = board.getPiece(x, y);
@@ -100,7 +137,7 @@ class ChessBoardRenderer extends WGridPanel {
                     icon = piece.getPath();
                 }
 
-                this.add(new WSprite(icon), x, y);
+                sprites[x][y].setImage(icon);
             }
         }
     }

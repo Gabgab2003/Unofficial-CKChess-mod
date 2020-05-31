@@ -1,6 +1,7 @@
 plugins {
     id 'fabric-loom' version '0.4.4'
     id 'maven-publish'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -18,6 +19,7 @@ repositories {
         name = "CottonMC"
         url = "http://server.bbkr.space:8081/artifactory/libs-release"
     }
+    mavenCentral()
 }
 
 dependencies {
@@ -28,6 +30,7 @@ dependencies {
     modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     modImplementation "io.github.cottonmc:LibGui:1.8.2+1.15.2"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 processResources {
@@ -80,5 +83,15 @@ publishing {
     repositories {
         // uncomment to publish to the local maven
         // mavenLocal()
+    }
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 }

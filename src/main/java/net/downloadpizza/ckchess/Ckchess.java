@@ -1,6 +1,5 @@
 package net.downloadpizza.ckchess;
 
-import net.downloadpizza.ckchess.board.ChessBoard;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
@@ -10,14 +9,14 @@ import net.fabricmc.fabric.api.event.client.ClientTickCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
 
 @Environment(EnvType.CLIENT)
 public class Ckchess implements ModInitializer {
     private static final String KEYBIND_CATEGORY = "Chess Keybindings";
 
-    private ChangeBoardGui selectionGui;
+    private final ChangeBoardGui selectionGui = new ChangeBoardGui();
+    private final ShowBoardGui showBoardGui = new ShowBoardGui(selectionGui);
 
     @Override
     public void onInitialize() {
@@ -40,26 +39,16 @@ public class Ckchess implements ModInitializer {
         KeyBindingRegistry.INSTANCE.register(selectionMenu);
         KeyBindingRegistry.INSTANCE.register(displayBoard);
 
-        selectionGui = new ChangeBoardGui();
-
         ClientTickCallback.EVENT.register(e ->
         {
-            if (selectionMenu.isPressed()) MinecraftClient.getInstance().openScreen(new PizzaScreen(selectionGui));
-            if (displayBoard.isPressed()) {
-                BlockPos block = selectionGui.getBlock();
-                CornerDirection dir = selectionGui.getDirection();
-                int spacing = selectionGui.getSpacing();
+            if (selectionMenu.isPressed())
+                MinecraftClient.getInstance().openScreen(new PizzaScreen(selectionGui));
 
-                if(spacing == -1) {
-                    return;
-                }
+            if (displayBoard.isPressed())
+                MinecraftClient.getInstance().openScreen(new PizzaScreen(showBoardGui));
 
-                boolean white = selectionGui.isWhiteSide();
-
-                if (block != null && dir != null) {
-                    ChessBoard cb = new ChessBoard(block, dir, spacing);
-                    MinecraftClient.getInstance().openScreen(new PizzaScreen(new ShowBoardGui(cb, white)));
-                }
+            if (MinecraftClient.getInstance().currentScreen instanceof PizzaScreen && ((PizzaScreen) MinecraftClient.getInstance().currentScreen).getDescription() instanceof ShowBoardGui) {
+                showBoardGui.redraw();
             }
         });
     }
