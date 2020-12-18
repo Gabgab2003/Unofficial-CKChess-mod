@@ -1,3 +1,5 @@
+IMPORTANT: THIS IS DEAD, THE NEW MOD IS ALMOST DONE AND WILL BE LINKED TO IN A FEW HOURS. THIS WAS A MESS. DO NOT USE THIS
+
 # Unofficial-CKChess-mod
 This can display Bannerbased (uses banner names like "White Queen") chessboards in minecraft.
 
